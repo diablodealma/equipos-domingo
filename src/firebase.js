@@ -10,14 +10,23 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore, doc, onSnapshot, setDoc } from "firebase/firestore";
 
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "PEGAR_ACA",
-  authDomain: "PEGAR_ACA",
-  projectId: "PEGAR_ACA",
-  storageBucket: "PEGAR_ACA",
-  messagingSenderId: "PEGAR_ACA",
-  appId: "PEGAR_ACA",
+  apiKey: "AIzaSyD6bDsy1JhWraNwOEvlVHoXX5GtDdJMgGI",
+  authDomain: "equipos-domingo.firebaseapp.com",
+  projectId: "equipos-domingo",
+  storageBucket: "equipos-domingo.firebasestorage.app",
+  messagingSenderId: "582493741897",
+  appId: "1:582493741897:web:175c9927442643afdeb098"
 };
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
 
 // ─── no hace falta tocar nada de acá para abajo ──────────────────────────────
 
