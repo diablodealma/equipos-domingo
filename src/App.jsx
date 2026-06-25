@@ -8,8 +8,12 @@ const _mem = {};
 const LS = {
   players: () => { try { return JSON.parse(localStorage.getItem("f5_players") || "[]"); } catch { return _mem.players || []; } },
   matches:  () => { try { return JSON.parse(localStorage.getItem("f5_matches")  || "[]"); } catch { return _mem.matches  || []; } },
+  ratings:  () => { try { return JSON.parse(localStorage.getItem("f5_ratings")  || "{}"); } catch { return _mem.ratings  || {}; } },
+  me:       () => { try { return localStorage.getItem("f5_me") || null; } catch { return _mem.me || null; } },
   savePlayers: p => { _mem.players = p; try { localStorage.setItem("f5_players", JSON.stringify(p)); } catch {} },
   saveMatches:  m => { _mem.matches  = m; try { localStorage.setItem("f5_matches",  JSON.stringify(m)); } catch {} },
+  saveRatings:  r => { _mem.ratings  = r; try { localStorage.setItem("f5_ratings",  JSON.stringify(r)); } catch {} },
+  saveMe:       id => { _mem.me = id; try { id == null ? localStorage.removeItem("f5_me") : localStorage.setItem("f5_me", String(id)); } catch {} },
 };
 
 // ─── constants ────────────────────────────────────────────────────────────────
@@ -33,7 +37,27 @@ const PALETTES = [
   { bg: "#ffffff", txt: "#18181b", name: "Blanco"   },
 ];
 
-const EMPTY_FORM = { name: "", atajando: 5, velocidad: 5, fisico: 5, definicion: 5, defensa: 5, gambeta: 5, lesionado: false };
+const EMPTY_FORM = { name: "", lesionado: false };
+
+
+// ─── habilidades efectivas (voto del grupo) ──────────────────────────────────
+// Cada jugador NO tiene habilidades propias: son el PROMEDIO de lo que votaron
+// los demás (nadie se vota a sí mismo). Sin votos todavía → neutro en 5.
+function effectiveSkills(playerId, ratings) {
+  const pid = String(playerId);
+  const sums = { atajando: 0, velocidad: 0, fisico: 0, definicion: 0, defensa: 0, gambeta: 0 };
+  let votos = 0;
+  Object.keys(ratings || {}).forEach(raterId => {
+    if (raterId === pid) return; // nadie se vota a sí mismo
+    const r = ratings[raterId] && ratings[raterId][pid];
+    if (!r) return;
+    votos++;
+    SKILLS.forEach(s => { sums[s.key] += Number(r[s.key]) || 0; });
+  });
+  const out = { votos };
+  SKILLS.forEach(s => { out[s.key] = votos ? Math.round((sums[s.key] / votos) * 10) / 10 : 5; });
+  return out;
+}
 
 // ─── scoring ─────────────────────────────────────────────────────────────────
 // Base score = promedio de habilidades
@@ -187,6 +211,8 @@ function SkillDots({ p }) {
 export default function App() {
   const [players, setPlayers] = useState(LS.players);
   const [matches,  setMatches]  = useState(LS.matches);
+  const [ratings, setRatings] = useState(LS.ratings);   // { raterId: { targetId: {6 habilidades} } }
+  const [meId, setMeId] = useState(LS.me);               // string | null (quién soy en este dispositivo)
   const [tab, setTab] = useState("jugadores");
   const [form, setForm] = useState(EMPTY_FORM);
   const [editId, setEditId] = useState(null);
@@ -199,9 +225,27 @@ export default function App() {
   const [attModal, setAttModal] = useState(null); // matchId
   // partido pendiente de feedback
   const [pendingMatch, setPendingMatch] = useState(null);
+  // identidad / votación
+  const [pickerOpen, setPickerOpen] = useState(false);   // overlay "¿quién sos?"
+  const [openVote, setOpenVote] = useState(null);        // targetId con panel de voto abierto
+
+  // Jugadores con habilidades EFECTIVAS (promedio del grupo) ya calculadas.
+  const ratedPlayers = players.map(p => ({ ...p, ...effectiveSkills(p.id, ratings) }));
+  const me = players.find(p => String(p.id) === String(meId)) || null;
 
   function persistPlayers(next) { setPlayers(next); LS.savePlayers(next); cloud.save({ players: next }); }
   function persistMatches(next)  { setMatches(next);  LS.saveMatches(next);  cloud.save({ matches: next }); }
+  function persistRatings(next)  { setRatings(next);  LS.saveRatings(next);  cloud.save({ ratings: next }); }
+  function chooseMe(id) { const s = String(id); setMeId(s); LS.saveMe(s); setPickerOpen(false); }
+
+  // Registrar/actualizar MI voto de una habilidad para un compañero
+  function setVote(targetId, skillKey, value) {
+    if (!meId) { setPickerOpen(true); return; }
+    const tid = String(targetId);
+    const prev = (ratings[meId] && ratings[meId][tid]) || { atajando: 5, velocidad: 5, fisico: 5, definicion: 5, defensa: 5, gambeta: 5 };
+    const next = { ...ratings, [meId]: { ...(ratings[meId] || {}), [tid]: { ...prev, [skillKey]: value } } };
+    persistRatings(next);
+  }
 
   // ── sincronización en la nube (Firebase) ──
   const seededRef = useRef(false);
@@ -210,6 +254,7 @@ export default function App() {
     const unsub = cloud.subscribe(data => {
       const cloudPlayers = (data && data.players) || [];
       const cloudMatches = (data && data.matches) || [];
+      const cloudRatings = (data && data.ratings) || {};
       const cloudEmpty = cloudPlayers.length === 0 && cloudMatches.length === 0;
       const localPlayers = LS.players();
       const localMatches = LS.matches();
@@ -218,7 +263,7 @@ export default function App() {
       // Primera vez: si la nube está vacía y este teléfono tiene data, la subimos (sin perder nada).
       if (cloudEmpty && localHasData && !seededRef.current) {
         seededRef.current = true;
-        cloud.save({ players: localPlayers, matches: localMatches });
+        cloud.save({ players: localPlayers, matches: localMatches, ratings: LS.ratings() });
         return; // seguimos mostrando lo local hasta que el guardado vuelva
       }
 
@@ -226,8 +271,10 @@ export default function App() {
       if (data) {
         setPlayers(cloudPlayers);
         setMatches(cloudMatches);
+        setRatings(cloudRatings);
         LS.savePlayers(cloudPlayers);
         LS.saveMatches(cloudMatches);
+        LS.saveRatings(cloudRatings);
       }
     });
     return unsub;
@@ -248,12 +295,22 @@ export default function App() {
     setForm(EMPTY_FORM);
   }
   function handleEdit(p) {
-    setForm({ name: p.name, atajando: p.atajando, velocidad: p.velocidad, fisico: p.fisico, definicion: p.definicion, defensa: p.defensa, gambeta: p.gambeta, lesionado: !!p.lesionado });
+    setForm({ name: p.name, lesionado: !!p.lesionado });
     setEditId(p.id); window.scrollTo({ top: 0, behavior: "smooth" });
   }
   function handleDelete(id) {
     persistPlayers(players.filter(p => p.id !== id));
     setSelected(s => s.filter(i => i !== id));
+    // limpiar votos del/para el jugador eliminado
+    const sid = String(id);
+    const cleaned = {};
+    Object.keys(ratings).forEach(raterId => {
+      if (raterId === sid) return;
+      const inner = { ...ratings[raterId] };
+      delete inner[sid];
+      cleaned[raterId] = inner;
+    });
+    persistRatings(cleaned);
     showToast("Jugador eliminado");
   }
   function toggleLesion(id) {
@@ -263,7 +320,7 @@ export default function App() {
     setSelected(s => s.includes(id) ? s.filter(i => i !== id) : [...s, id]);
   }
   function pool() {
-    const base = selected.length ? players.filter(p => selected.includes(p.id)) : players;
+    const base = selected.length ? ratedPlayers.filter(p => selected.includes(p.id)) : ratedPlayers;
     return base.filter(p => !p.lesionado); // los lesionados no entran al armado
   }
 
@@ -397,26 +454,72 @@ export default function App() {
       {/* TABS */}
       <div style={{ background: "#09141f", borderBottom: "1px solid #0f2d4a", display: "flex" }}>
         {[
-          { id: "jugadores", label: "JUGADORES", icon: "👥" },
+          { id: "jugadores", label: "PLANTEL",   icon: "👥" },
+          { id: "votar",     label: "VOTAR",     icon: "🗳️" },
           { id: "equipos",   label: "EQUIPOS",   icon: "🔀" },
-          { id: "historial", label: "HISTORIAL",  icon: "📋" },
-          { id: "stats",     label: "STATS",      icon: "🏆" },
+          { id: "historial", label: "HISTORIAL", icon: "📋" },
+          { id: "stats",     label: "STATS",     icon: "🏆" },
         ].map(t => (
           <button key={t.id} onClick={() => setTab(t.id)} style={{
-            flex: 1, padding: "12px 0", border: "none", background: "transparent",
+            flex: 1, padding: "9px 0 7px", border: "none", background: "transparent",
             color: tab === t.id ? "#0ea5e9" : "#3d5a73",
             borderBottom: `2px solid ${tab === t.id ? "#0ea5e9" : "transparent"}`,
-            fontFamily: "'Bebas Neue',cursive", fontSize: 13, letterSpacing: 1,
-            cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 4,
+            fontFamily: "'Bebas Neue',cursive", fontSize: 11, letterSpacing: 0.5,
+            cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 2,
           }}>
-            {t.icon} {t.label}
+            <span style={{ fontSize: 15 }}>{t.icon}</span>
+            <span>{t.label}</span>
           </button>
         ))}
       </div>
 
+      {/* BARRA DE IDENTIDAD */}
+      {players.length > 0 && (
+        <div style={{ maxWidth: 560, margin: "0 auto", padding: "8px 14px 0" }}>
+          <button onClick={() => setPickerOpen(true)} style={{
+            width: "100%", padding: "8px 12px", borderRadius: 10, cursor: "pointer", textAlign: "left",
+            background: me ? "#0c1c30" : "#0c1e33",
+            border: `1px solid ${me ? "#1a3a55" : "#0ea5e9"}`,
+            color: me ? "#94a3b8" : "#0ea5e9",
+            display: "flex", alignItems: "center", gap: 8, fontSize: 13,
+          }}>
+            <span style={{ fontSize: 15 }}>👤</span>
+            {me
+              ? <><span style={{ flex: 1 }}>Sos <b style={{ color: "#e2e8f0" }}>{me.name}</b></span><span style={{ color: "#3d5a73" }}>cambiar ▾</span></>
+              : <span style={{ flex: 1 }}>¿Quién sos? Tocá para elegirte y poder votar</span>}
+          </button>
+        </div>
+      )}
+
+      {/* OVERLAY: elegir quién sos */}
+      {pickerOpen && (
+        <div onClick={() => setPickerOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(3,8,15,0.85)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 380, maxHeight: "80vh", overflowY: "auto", background: "#09141f", border: "1px solid #0f2d4a", borderRadius: 18, padding: 18 }}>
+            <div style={{ fontFamily: "'Bebas Neue',cursive", fontSize: 20, letterSpacing: 2, color: "#0ea5e9", marginBottom: 4 }}>¿QUIÉN SOS?</div>
+            <div style={{ fontSize: 12, color: "#3d5a73", marginBottom: 14 }}>Elegite de la lista. Vas a poder puntuar a todos menos a vos.</div>
+            {players.length === 0 && <div style={{ color: "#3d5a73", fontSize: 13 }}>Todavía no hay jugadores cargados.</div>}
+            {players.map(p => {
+              const isMe = String(p.id) === String(meId);
+              return (
+                <button key={p.id} onClick={() => chooseMe(p.id)} style={{
+                  width: "100%", marginBottom: 8, padding: "12px 14px", borderRadius: 11, cursor: "pointer", textAlign: "left",
+                  background: isMe ? "#0c1e33" : "#0c1c30",
+                  border: `1px solid ${isMe ? "#0ea5e9" : "#1a3a55"}`,
+                  color: "#e2e8f0", fontSize: 15, fontWeight: 600,
+                  display: "flex", alignItems: "center", gap: 8,
+                }}>
+                  <span style={{ flex: 1 }}>{p.name}</span>
+                  {isMe && <span style={{ fontSize: 11, color: "#0ea5e9" }}>✓ sos vos</span>}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       <div style={{ maxWidth: 560, margin: "0 auto", padding: "0 14px" }}>
 
-        {/* ══════ JUGADORES ══════ */}
+        {/* ══════ PLANTEL ══════ */}
         {tab === "jugadores" && (
           <>
             <div style={{ marginTop: 18, background: "linear-gradient(145deg,#0c1c30,#09141f)", border: `1px solid ${editId ? "#f59e0b44" : "#0f2d4a"}`, borderRadius: 18, padding: 20 }}>
@@ -426,11 +529,10 @@ export default function App() {
               <input placeholder="Nombre del jugador…" value={form.name}
                 onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
                 onKeyDown={e => e.key === "Enter" && handleSave()}
-                style={{ width: "100%", padding: "11px 14px", borderRadius: 10, background: "#060c15", border: "1px solid #1a3a55", color: "#e2e8f0", fontSize: 15, outline: "none", boxSizing: "border-box", marginBottom: 18 }} />
-              <div style={{ fontSize: 11, color: "#2d4a6a", letterSpacing: 1.5, marginBottom: 12 }}>HABILIDADES (1 – 10)</div>
-              {SKILLS.map(s => (
-                <ScorePicker key={s.key} sk={s} value={form[s.key]} onChange={v => setForm(f => ({ ...f, [s.key]: v }))} />
-              ))}
+                style={{ width: "100%", padding: "11px 14px", borderRadius: 10, background: "#060c15", border: "1px solid #1a3a55", color: "#e2e8f0", fontSize: 15, outline: "none", boxSizing: "border-box", marginBottom: 14 }} />
+              <div style={{ fontSize: 11, color: "#2d4a6a", lineHeight: 1.5, marginBottom: 12 }}>
+                Solo el nombre. Las habilidades salen del <b style={{ color: "#3d5a73" }}>voto del grupo</b> (pestaña 🗳️ Votar).
+              </div>
               <button type="button" onClick={() => setForm(f => ({ ...f, lesionado: !f.lesionado }))} style={{
                 width: "100%", marginTop: 4, padding: "11px 14px", borderRadius: 11, cursor: "pointer", textAlign: "left",
                 background: form.lesionado ? "#3b1e1e" : "#060c15",
@@ -469,7 +571,7 @@ export default function App() {
                   <div style={{ fontSize: 42, marginBottom: 8 }}>⚽</div>
                   <div style={{ fontFamily: "'Bebas Neue',cursive", fontSize: 17, letterSpacing: 2 }}>AGREGÁ TUS JUGADORES</div>
                 </div>
-              ) : players.map(p => {
+              ) : ratedPlayers.map(p => {
                 const sel = selected.includes(p.id);
                 const att = playerAttendance(p.id);
                 return (
@@ -484,15 +586,65 @@ export default function App() {
                         </span>
                       )}
                       {sel && <span style={{ fontSize: 10, background: "#0ea5e920", color: "#0ea5e9", borderRadius: 5, padding: "1px 6px", flexShrink: 0 }}>✓</span>}
+                      <span style={{ fontSize: 10, color: p.votos ? "#0ea5e9" : "#3d5a73", background: "#0c1c30", padding: "2px 7px", borderRadius: 6, flexShrink: 0 }}>{p.votos ? `${p.votos} ${p.votos === 1 ? "voto" : "votos"}` : "sin votos"}</span>
                       <button onClick={e => { e.stopPropagation(); toggleLesion(p.id); }} title="Lesionado" style={{ padding: "4px 8px", borderRadius: 7, background: p.lesionado ? "#3b1e1e" : "#0c1c30", border: `1px solid ${p.lesionado ? "#ef4444" : "#1a3a55"}`, color: p.lesionado ? "#fca5a5" : "#64748b", cursor: "pointer", fontSize: 12 }}>🚑</button>
                       <button onClick={e => { e.stopPropagation(); handleEdit(p); }} style={{ padding: "4px 8px", borderRadius: 7, background: "#0c1c30", border: "1px solid #1a3a55", color: "#64748b", cursor: "pointer", fontSize: 12 }}>✏️</button>
                       <button onClick={e => { e.stopPropagation(); handleDelete(p.id); }} style={{ padding: "4px 8px", borderRadius: 7, background: "#0c1c30", border: "1px solid #3b1e1e", color: "#f87171", cursor: "pointer", fontSize: 12 }}>🗑️</button>
                     </div>
-                    <SkillDots p={p} />
+                    {p.votos > 0
+                      ? <SkillDots p={p} />
+                      : <div style={{ fontSize: 11, color: "#3d5a73", fontStyle: "italic" }}>Todavía sin votos · neutro hasta que el grupo puntúe</div>}
                   </div>
                 );
               })}
             </div>
+          </>
+        )}
+
+        {/* ══════ VOTAR ══════ */}
+        {tab === "votar" && (
+          <>
+            {players.length === 0 ? (
+              <div style={{ textAlign: "center", padding: "50px 20px", color: "#1a3a55", border: "1px dashed #1a3a55", borderRadius: 16, marginTop: 18 }}>
+                <div style={{ fontSize: 42, marginBottom: 8 }}>🗳️</div>
+                <div style={{ fontFamily: "'Bebas Neue',cursive", fontSize: 17, letterSpacing: 2 }}>PRIMERO CARGÁ JUGADORES</div>
+              </div>
+            ) : !me ? (
+              <div style={{ textAlign: "center", padding: "44px 24px", color: "#64748b", border: "1px dashed #1a3a55", borderRadius: 16, marginTop: 18 }}>
+                <div style={{ fontSize: 40, marginBottom: 10 }}>👤</div>
+                <div style={{ fontFamily: "'Bebas Neue',cursive", fontSize: 18, letterSpacing: 2, color: "#94a3b8", marginBottom: 6 }}>¿QUIÉN SOS?</div>
+                <div style={{ fontSize: 13, marginBottom: 18 }}>Elegite de la lista para empezar a puntuar a los demás.</div>
+                <button onClick={() => setPickerOpen(true)} style={{ padding: "11px 26px", borderRadius: 12, background: "linear-gradient(135deg,#1e40af,#0ea5e9)", border: "none", color: "#fff", fontFamily: "'Bebas Neue',cursive", fontSize: 16, letterSpacing: 2, cursor: "pointer" }}>ELEGIRME</button>
+              </div>
+            ) : (
+              <>
+                <div style={{ marginTop: 18, marginBottom: 12, fontSize: 12, color: "#3d5a73", lineHeight: 1.5 }}>
+                  Puntuás como <b style={{ color: "#0ea5e9" }}>{me.name}</b>. Tu propia tarjeta no aparece. Tocá un compañero y cargá sus 6 habilidades; los votos son anónimos y se promedian con los del resto.
+                </div>
+                {ratedPlayers.filter(p => String(p.id) !== String(meId)).map(p => {
+                  const myVote = (ratings[meId] && ratings[meId][String(p.id)]) || null;
+                  const open = openVote === p.id;
+                  return (
+                    <div key={p.id} style={{ background: "#09141f", border: `1px solid ${open ? "#0ea5e9" : "#0f2d4a"}`, borderRadius: 14, marginBottom: 10, overflow: "hidden" }}>
+                      <button onClick={() => setOpenVote(open ? null : p.id)} style={{ width: "100%", padding: "13px 14px", background: "transparent", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, textAlign: "left" }}>
+                        <span style={{ fontWeight: 700, fontSize: 15, color: "#f1f5f9", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.name}</span>
+                        {myVote
+                          ? <span style={{ fontSize: 11, color: "#10b981", background: "#10b98115", padding: "2px 8px", borderRadius: 6 }}>✓ lo votaste</span>
+                          : <span style={{ fontSize: 11, color: "#64748b" }}>sin tu voto</span>}
+                        <span style={{ color: "#3d5a73", fontSize: 13 }}>{open ? "▲" : "▼"}</span>
+                      </button>
+                      {open && (
+                        <div style={{ padding: "4px 14px 16px" }}>
+                          {SKILLS.map(s => (
+                            <ScorePicker key={s.key} sk={s} value={(myVote && myVote[s.key]) ?? 5} onChange={v => setVote(p.id, s.key, v)} />
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </>
+            )}
           </>
         )}
 
