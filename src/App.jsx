@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { cloud } from "./firebase.js";
 
 // ─── storage ──────────────────────────────────────────────────────────────────
 // Persiste en localStorage cuando está disponible (deploy real) y cae a memoria
@@ -199,8 +200,38 @@ export default function App() {
   // partido pendiente de feedback
   const [pendingMatch, setPendingMatch] = useState(null);
 
-  function persistPlayers(next) { setPlayers(next); LS.savePlayers(next); }
-  function persistMatches(next)  { setMatches(next);  LS.saveMatches(next); }
+  function persistPlayers(next) { setPlayers(next); LS.savePlayers(next); cloud.save({ players: next }); }
+  function persistMatches(next)  { setMatches(next);  LS.saveMatches(next);  cloud.save({ matches: next }); }
+
+  // ── sincronización en la nube (Firebase) ──
+  const seededRef = useRef(false);
+  useEffect(() => {
+    if (!cloud.ready) return; // sin Firebase configurado → sólo este dispositivo
+    const unsub = cloud.subscribe(data => {
+      const cloudPlayers = (data && data.players) || [];
+      const cloudMatches = (data && data.matches) || [];
+      const cloudEmpty = cloudPlayers.length === 0 && cloudMatches.length === 0;
+      const localPlayers = LS.players();
+      const localMatches = LS.matches();
+      const localHasData = localPlayers.length > 0 || localMatches.length > 0;
+
+      // Primera vez: si la nube está vacía y este teléfono tiene data, la subimos (sin perder nada).
+      if (cloudEmpty && localHasData && !seededRef.current) {
+        seededRef.current = true;
+        cloud.save({ players: localPlayers, matches: localMatches });
+        return; // seguimos mostrando lo local hasta que el guardado vuelva
+      }
+
+      // De ahí en más, la nube manda: actualizamos pantalla y cache local.
+      if (data) {
+        setPlayers(cloudPlayers);
+        setMatches(cloudMatches);
+        LS.savePlayers(cloudPlayers);
+        LS.saveMatches(cloudMatches);
+      }
+    });
+    return unsub;
+  }, []);
   function showToast(msg) { setToast(msg); setTimeout(() => setToast(""), 2400); }
 
   // ── jugadores ──
@@ -357,6 +388,7 @@ export default function App() {
             <div style={{ fontFamily: "'Bebas Neue',cursive", fontSize: 22, letterSpacing: 3, color: "#fff", lineHeight: 1 }}>FÚTBOL 5 — DOMINGO</div>
             <div style={{ fontSize: 10, color: "#2d4a6a", letterSpacing: 1.5, marginTop: 2 }}>
               {players.length} JUGADORES · {matches.length} PARTIDOS
+              {cloud.ready && <span style={{ color: "#10b981", letterSpacing: 0 }}> · ☁️ en la nube</span>}
             </div>
           </div>
         </div>
