@@ -27,14 +27,8 @@ const SKILLS = [
 ];
 
 const PALETTES = [
-  { bg: "#ef4444", txt: "#fff",    name: "Rojo"     },
-  { bg: "#3b82f6", txt: "#fff",    name: "Azul"     },
-  { bg: "#f59e0b", txt: "#111",    name: "Amarillo" },
-  { bg: "#10b981", txt: "#fff",    name: "Verde"    },
-  { bg: "#a855f7", txt: "#fff",    name: "Violeta"  },
-  { bg: "#f97316", txt: "#fff",    name: "Naranja"  },
-  { bg: "#18181b", txt: "#ffffff", name: "Negro"    },
-  { bg: "#ffffff", txt: "#18181b", name: "Blanco"   },
+  { bg: "#18181b", txt: "#ffffff", disp: "#cbd5e1", name: "Negro"  },
+  { bg: "#f1f5f9", txt: "#18181b", disp: "#e2e8f0", name: "Blanco" },
 ];
 
 const EMPTY_FORM = { name: "", lesionado: false };
@@ -162,7 +156,7 @@ function Shirt({ pal, num, size = 44 }) {
 }
 
 function ScorePicker({ sk, value, onChange }) {
-  const col = value >= 8 ? "#10b981" : value >= 5 ? "#3b82f6" : "#64748b";
+  const col = value >= 8 ? "#10b981" : value >= 5 ? "#3b82f6" : "#8597ad";
   return (
     <div style={{ marginBottom: 14 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
@@ -179,8 +173,8 @@ function ScorePicker({ sk, value, onChange }) {
             <button key={n} type="button" onClick={() => onChange(n)} style={{
               flex: 1, padding: "10px 0", borderRadius: 6, cursor: "pointer",
               border: active ? `1px solid ${col}` : "1px solid transparent",
-              background: on ? col + (active ? "44" : "22") : "#0f2040",
-              color: on ? col : "#3d5a73",
+              background: on ? col + (active ? "44" : "22") : "#273c5c",
+              color: on ? col : "#7e98b4",
               fontFamily: "'Bebas Neue',cursive", fontSize: 15, lineHeight: 1,
               WebkitTapHighlightColor: "transparent",
             }}>{n}</button>
@@ -195,7 +189,7 @@ function SkillDots({ p }) {
   return (
     <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
       {SKILLS.map(s => {
-        const col = p[s.key] >= 8 ? "#10b981" : p[s.key] >= 5 ? "#3b82f6" : "#475569";
+        const col = p[s.key] >= 8 ? "#10b981" : p[s.key] >= 5 ? "#3b82f6" : "#6d8099";
         return (
           <div key={s.key} title={`${s.label}: ${p[s.key]}`} style={{ display: "flex", alignItems: "center", gap: 3 }}>
             <span style={{ fontSize: 11 }}>{s.icon}</span>
@@ -434,16 +428,16 @@ export default function App() {
   const equipoAnio        = statList().sort((a, b) => b.st.puntos - a.st.puntos).slice(0, 5);
 
   return (
-    <div style={{ minHeight: "100vh", background: "#060c15", fontFamily: "'Outfit','Segoe UI',sans-serif", color: "#e2e8f0", paddingBottom: 80 }}>
+    <div style={{ minHeight: "100vh", background: "#0c1a2b", fontFamily: "'Outfit','Segoe UI',sans-serif", color: "#e2e8f0", paddingBottom: 80 }}>
       <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet" />
 
       {/* HEADER */}
-      <div style={{ background: "linear-gradient(180deg,#0c1c30 0%,#060c15 100%)", borderBottom: "1px solid #0f2d4a", padding: "16px 20px 12px", position: "sticky", top: 0, zIndex: 100 }}>
+      <div style={{ background: "linear-gradient(180deg,#18293f 0%,#0c1a2b 100%)", borderBottom: "1px solid #2c4a6b", padding: "16px 20px 12px", position: "sticky", top: 0, zIndex: 100 }}>
         <div style={{ maxWidth: 560, margin: "0 auto", display: "flex", alignItems: "center", gap: 12 }}>
           <div style={{ width: 40, height: 40, borderRadius: 11, background: "linear-gradient(135deg,#1e40af,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>⚽</div>
           <div>
             <div style={{ fontFamily: "'Bebas Neue',cursive", fontSize: 22, letterSpacing: 3, color: "#fff", lineHeight: 1 }}>FÚTBOL 5 — DOMINGO</div>
-            <div style={{ fontSize: 10, color: "#2d4a6a", letterSpacing: 1.5, marginTop: 2 }}>
+            <div style={{ fontSize: 10, color: "#738cab", letterSpacing: 1.5, marginTop: 2 }}>
               {players.length} JUGADORES · {matches.length} PARTIDOS
               {cloud.ready && <span style={{ color: "#10b981", letterSpacing: 0 }}> · ☁️ en la nube</span>}
             </div>
@@ -452,7 +446,7 @@ export default function App() {
       </div>
 
       {/* TABS */}
-      <div style={{ background: "#09141f", borderBottom: "1px solid #0f2d4a", display: "flex" }}>
+      <div style={{ background: "#12243a", borderBottom: "1px solid #2c4a6b", display: "flex" }}>
         {[
           { id: "jugadores", label: "PLANTEL",   icon: "👥" },
           { id: "votar",     label: "VOTAR",     icon: "🗳️" },
@@ -462,7 +456,7 @@ export default function App() {
         ].map(t => (
           <button key={t.id} onClick={() => setTab(t.id)} style={{
             flex: 1, padding: "9px 0 7px", border: "none", background: "transparent",
-            color: tab === t.id ? "#0ea5e9" : "#3d5a73",
+            color: tab === t.id ? "#0ea5e9" : "#7e98b4",
             borderBottom: `2px solid ${tab === t.id ? "#0ea5e9" : "transparent"}`,
             fontFamily: "'Bebas Neue',cursive", fontSize: 11, letterSpacing: 0.5,
             cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 2,
@@ -478,14 +472,14 @@ export default function App() {
         <div style={{ maxWidth: 560, margin: "0 auto", padding: "8px 14px 0" }}>
           <button onClick={() => setPickerOpen(true)} style={{
             width: "100%", padding: "8px 12px", borderRadius: 10, cursor: "pointer", textAlign: "left",
-            background: me ? "#0c1c30" : "#0c1e33",
-            border: `1px solid ${me ? "#1a3a55" : "#0ea5e9"}`,
+            background: me ? "#18293f" : "#1d3553",
+            border: `1px solid ${me ? "#36577d" : "#0ea5e9"}`,
             color: me ? "#94a3b8" : "#0ea5e9",
             display: "flex", alignItems: "center", gap: 8, fontSize: 13,
           }}>
             <span style={{ fontSize: 15 }}>👤</span>
             {me
-              ? <><span style={{ flex: 1 }}>Sos <b style={{ color: "#e2e8f0" }}>{me.name}</b></span><span style={{ color: "#3d5a73" }}>cambiar ▾</span></>
+              ? <><span style={{ flex: 1 }}>Sos <b style={{ color: "#e2e8f0" }}>{me.name}</b></span><span style={{ color: "#7e98b4" }}>cambiar ▾</span></>
               : <span style={{ flex: 1 }}>¿Quién sos? Tocá para elegirte y poder votar</span>}
           </button>
         </div>
@@ -494,17 +488,17 @@ export default function App() {
       {/* OVERLAY: elegir quién sos */}
       {pickerOpen && (
         <div onClick={() => setPickerOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(3,8,15,0.85)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
-          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 380, maxHeight: "80vh", overflowY: "auto", background: "#09141f", border: "1px solid #0f2d4a", borderRadius: 18, padding: 18 }}>
+          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 380, maxHeight: "80vh", overflowY: "auto", background: "#12243a", border: "1px solid #2c4a6b", borderRadius: 18, padding: 18 }}>
             <div style={{ fontFamily: "'Bebas Neue',cursive", fontSize: 20, letterSpacing: 2, color: "#0ea5e9", marginBottom: 4 }}>¿QUIÉN SOS?</div>
-            <div style={{ fontSize: 12, color: "#3d5a73", marginBottom: 14 }}>Elegite de la lista. Vas a poder puntuar a todos menos a vos.</div>
-            {players.length === 0 && <div style={{ color: "#3d5a73", fontSize: 13 }}>Todavía no hay jugadores cargados.</div>}
+            <div style={{ fontSize: 12, color: "#7e98b4", marginBottom: 14 }}>Elegite de la lista. Vas a poder puntuar a todos menos a vos.</div>
+            {players.length === 0 && <div style={{ color: "#7e98b4", fontSize: 13 }}>Todavía no hay jugadores cargados.</div>}
             {players.map(p => {
               const isMe = String(p.id) === String(meId);
               return (
                 <button key={p.id} onClick={() => chooseMe(p.id)} style={{
                   width: "100%", marginBottom: 8, padding: "12px 14px", borderRadius: 11, cursor: "pointer", textAlign: "left",
-                  background: isMe ? "#0c1e33" : "#0c1c30",
-                  border: `1px solid ${isMe ? "#0ea5e9" : "#1a3a55"}`,
+                  background: isMe ? "#1d3553" : "#18293f",
+                  border: `1px solid ${isMe ? "#0ea5e9" : "#36577d"}`,
                   color: "#e2e8f0", fontSize: 15, fontWeight: 600,
                   display: "flex", alignItems: "center", gap: 8,
                 }}>
@@ -522,43 +516,43 @@ export default function App() {
         {/* ══════ PLANTEL ══════ */}
         {tab === "jugadores" && (
           <>
-            <div style={{ marginTop: 18, background: "linear-gradient(145deg,#0c1c30,#09141f)", border: `1px solid ${editId ? "#f59e0b44" : "#0f2d4a"}`, borderRadius: 18, padding: 20 }}>
+            <div style={{ marginTop: 18, background: "linear-gradient(145deg,#18293f,#12243a)", border: `1px solid ${editId ? "#f59e0b44" : "#2c4a6b"}`, borderRadius: 18, padding: 20 }}>
               <div style={{ fontFamily: "'Bebas Neue',cursive", fontSize: 16, letterSpacing: 2, color: editId ? "#f59e0b" : "#0ea5e9", marginBottom: 16 }}>
                 {editId ? "✏️  EDITAR JUGADOR" : "➕  NUEVO JUGADOR"}
               </div>
               <input placeholder="Nombre del jugador…" value={form.name}
                 onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
                 onKeyDown={e => e.key === "Enter" && handleSave()}
-                style={{ width: "100%", padding: "11px 14px", borderRadius: 10, background: "#060c15", border: "1px solid #1a3a55", color: "#e2e8f0", fontSize: 15, outline: "none", boxSizing: "border-box", marginBottom: 14 }} />
-              <div style={{ fontSize: 11, color: "#2d4a6a", lineHeight: 1.5, marginBottom: 12 }}>
-                Solo el nombre. Las habilidades salen del <b style={{ color: "#3d5a73" }}>voto del grupo</b> (pestaña 🗳️ Votar).
+                style={{ width: "100%", padding: "11px 14px", borderRadius: 10, background: "#0c1a2b", border: "1px solid #36577d", color: "#e2e8f0", fontSize: 15, outline: "none", boxSizing: "border-box", marginBottom: 14 }} />
+              <div style={{ fontSize: 11, color: "#738cab", lineHeight: 1.5, marginBottom: 12 }}>
+                Solo el nombre. Las habilidades salen del <b style={{ color: "#7e98b4" }}>voto del grupo</b> (pestaña 🗳️ Votar).
               </div>
               <button type="button" onClick={() => setForm(f => ({ ...f, lesionado: !f.lesionado }))} style={{
                 width: "100%", marginTop: 4, padding: "11px 14px", borderRadius: 11, cursor: "pointer", textAlign: "left",
-                background: form.lesionado ? "#3b1e1e" : "#060c15",
-                border: `1px solid ${form.lesionado ? "#ef4444" : "#1a3a55"}`,
-                color: form.lesionado ? "#fca5a5" : "#64748b",
+                background: form.lesionado ? "#3b1e1e" : "#0c1a2b",
+                border: `1px solid ${form.lesionado ? "#ef4444" : "#36577d"}`,
+                color: form.lesionado ? "#fca5a5" : "#8597ad",
                 display: "flex", alignItems: "center", gap: 10, fontSize: 14,
               }}>
                 <span style={{ fontSize: 18 }}>🚑</span>
                 <span style={{ flex: 1 }}>Lesionado{form.lesionado ? " · no entra al armado" : ""}</span>
-                <span style={{ fontFamily: "'Bebas Neue',cursive", fontSize: 14, letterSpacing: 1, color: form.lesionado ? "#ef4444" : "#3d5a73" }}>{form.lesionado ? "SÍ" : "NO"}</span>
+                <span style={{ fontFamily: "'Bebas Neue',cursive", fontSize: 14, letterSpacing: 1, color: form.lesionado ? "#ef4444" : "#7e98b4" }}>{form.lesionado ? "SÍ" : "NO"}</span>
               </button>
               <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
                 <button onClick={handleSave} style={{ flex: 1, padding: 13, borderRadius: 11, background: editId ? "linear-gradient(135deg,#92400e,#f59e0b)" : "linear-gradient(135deg,#1e40af,#0ea5e9)", border: "none", color: "#fff", fontFamily: "'Bebas Neue',cursive", fontSize: 18, letterSpacing: 2, cursor: "pointer" }}>
                   {editId ? "GUARDAR CAMBIOS" : "AGREGAR"}
                 </button>
                 {editId && (
-                  <button onClick={() => { setEditId(null); setForm(EMPTY_FORM); }} style={{ padding: "13px 16px", borderRadius: 11, background: "#0c1c30", border: "1px solid #1a3a55", color: "#3d5a73", cursor: "pointer", fontSize: 18 }}>✕</button>
+                  <button onClick={() => { setEditId(null); setForm(EMPTY_FORM); }} style={{ padding: "13px 16px", borderRadius: 11, background: "#18293f", border: "1px solid #36577d", color: "#7e98b4", cursor: "pointer", fontSize: 18 }}>✕</button>
                 )}
               </div>
             </div>
 
             {players.length >= 2 && (
-              <div style={{ marginTop: 12, display: "flex", gap: 10, alignItems: "center", background: "#09141f", borderRadius: 12, padding: "11px 14px", border: "1px solid #0f2d4a" }}>
-                <div style={{ flex: 1, fontSize: 12, color: "#3d5a73" }}>{selected.length ? `${selected.length} seleccionados` : "Tocá para seleccionar"}</div>
+              <div style={{ marginTop: 12, display: "flex", gap: 10, alignItems: "center", background: "#12243a", borderRadius: 12, padding: "11px 14px", border: "1px solid #2c4a6b" }}>
+                <div style={{ flex: 1, fontSize: 12, color: "#7e98b4" }}>{selected.length ? `${selected.length} seleccionados` : "Tocá para seleccionar"}</div>
                 <button onClick={() => setSelected(selected.length === players.length ? [] : players.map(p => p.id))}
-                  style={{ padding: "6px 12px", borderRadius: 8, background: "#0c1c30", border: "1px solid #1a3a55", color: "#3d5a73", cursor: "pointer", fontSize: 12, whiteSpace: "nowrap" }}>
+                  style={{ padding: "6px 12px", borderRadius: 8, background: "#18293f", border: "1px solid #36577d", color: "#7e98b4", cursor: "pointer", fontSize: 12, whiteSpace: "nowrap" }}>
                   {selected.length === players.length ? "Ninguno" : "Todos"}
                 </button>
                 <button onClick={handleBalance} style={{ padding: "8px 16px", borderRadius: 10, background: "linear-gradient(135deg,#064e3b,#10b981)", border: "none", color: "#fff", fontFamily: "'Bebas Neue',cursive", fontSize: 16, letterSpacing: 1, cursor: "pointer", whiteSpace: "nowrap" }}>⚡ ARMAR</button>
@@ -567,7 +561,7 @@ export default function App() {
 
             <div style={{ marginTop: 12 }}>
               {players.length === 0 ? (
-                <div style={{ textAlign: "center", padding: "50px 20px", color: "#1a3a55", border: "1px dashed #1a3a55", borderRadius: 16 }}>
+                <div style={{ textAlign: "center", padding: "50px 20px", color: "#36577d", border: "1px dashed #36577d", borderRadius: 16 }}>
                   <div style={{ fontSize: 42, marginBottom: 8 }}>⚽</div>
                   <div style={{ fontFamily: "'Bebas Neue',cursive", fontSize: 17, letterSpacing: 2 }}>AGREGÁ TUS JUGADORES</div>
                 </div>
@@ -575,25 +569,25 @@ export default function App() {
                 const sel = selected.includes(p.id);
                 const att = playerAttendance(p.id);
                 return (
-                  <div key={p.id} onClick={() => toggleSelect(p.id)} style={{ background: sel ? "#0c1e33" : "#09141f", border: `1px solid ${sel ? "#0ea5e9" : p.lesionado ? "#5b2b2b" : "#0f2d4a"}`, borderRadius: 14, padding: "13px 14px", marginBottom: 10, cursor: "pointer", transition: "all .15s", opacity: p.lesionado ? 0.7 : 1 }}>
+                  <div key={p.id} onClick={() => toggleSelect(p.id)} style={{ background: sel ? "#1d3553" : "#12243a", border: `1px solid ${sel ? "#0ea5e9" : p.lesionado ? "#5b2b2b" : "#2c4a6b"}`, borderRadius: 14, padding: "13px 14px", marginBottom: 10, cursor: "pointer", transition: "all .15s", opacity: p.lesionado ? 0.7 : 1 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 7 }}>
                       <span style={{ fontWeight: 700, fontSize: 15, color: "#f1f5f9", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.name}</span>
                       {p.lesionado && <span style={{ fontSize: 11, background: "#3b1e1e", color: "#fca5a5", borderRadius: 5, padding: "1px 6px", flexShrink: 0 }}>🚑</span>}
                       <span style={{ flex: 1 }} />
                       {att.total > 0 && (
-                        <span style={{ fontSize: 10, color: "#3d5a73", background: "#0c1c30", padding: "2px 7px", borderRadius: 6 }}>
+                        <span style={{ fontSize: 10, color: "#7e98b4", background: "#18293f", padding: "2px 7px", borderRadius: 6 }}>
                           {att.attended}/{att.total} partidos
                         </span>
                       )}
                       {sel && <span style={{ fontSize: 10, background: "#0ea5e920", color: "#0ea5e9", borderRadius: 5, padding: "1px 6px", flexShrink: 0 }}>✓</span>}
-                      <span style={{ fontSize: 10, color: p.votos ? "#0ea5e9" : "#3d5a73", background: "#0c1c30", padding: "2px 7px", borderRadius: 6, flexShrink: 0 }}>{p.votos ? `${p.votos} ${p.votos === 1 ? "voto" : "votos"}` : "sin votos"}</span>
-                      <button onClick={e => { e.stopPropagation(); toggleLesion(p.id); }} title="Lesionado" style={{ padding: "4px 8px", borderRadius: 7, background: p.lesionado ? "#3b1e1e" : "#0c1c30", border: `1px solid ${p.lesionado ? "#ef4444" : "#1a3a55"}`, color: p.lesionado ? "#fca5a5" : "#64748b", cursor: "pointer", fontSize: 12 }}>🚑</button>
-                      <button onClick={e => { e.stopPropagation(); handleEdit(p); }} style={{ padding: "4px 8px", borderRadius: 7, background: "#0c1c30", border: "1px solid #1a3a55", color: "#64748b", cursor: "pointer", fontSize: 12 }}>✏️</button>
-                      <button onClick={e => { e.stopPropagation(); handleDelete(p.id); }} style={{ padding: "4px 8px", borderRadius: 7, background: "#0c1c30", border: "1px solid #3b1e1e", color: "#f87171", cursor: "pointer", fontSize: 12 }}>🗑️</button>
+                      <span style={{ fontSize: 10, color: p.votos ? "#0ea5e9" : "#7e98b4", background: "#18293f", padding: "2px 7px", borderRadius: 6, flexShrink: 0 }}>{p.votos ? `${p.votos} ${p.votos === 1 ? "voto" : "votos"}` : "sin votos"}</span>
+                      <button onClick={e => { e.stopPropagation(); toggleLesion(p.id); }} title="Lesionado" style={{ padding: "4px 8px", borderRadius: 7, background: p.lesionado ? "#3b1e1e" : "#18293f", border: `1px solid ${p.lesionado ? "#ef4444" : "#36577d"}`, color: p.lesionado ? "#fca5a5" : "#8597ad", cursor: "pointer", fontSize: 12 }}>🚑</button>
+                      <button onClick={e => { e.stopPropagation(); handleEdit(p); }} style={{ padding: "4px 8px", borderRadius: 7, background: "#18293f", border: "1px solid #36577d", color: "#8597ad", cursor: "pointer", fontSize: 12 }}>✏️</button>
+                      <button onClick={e => { e.stopPropagation(); handleDelete(p.id); }} style={{ padding: "4px 8px", borderRadius: 7, background: "#18293f", border: "1px solid #3b1e1e", color: "#f87171", cursor: "pointer", fontSize: 12 }}>🗑️</button>
                     </div>
                     {p.votos > 0
                       ? <SkillDots p={p} />
-                      : <div style={{ fontSize: 11, color: "#3d5a73", fontStyle: "italic" }}>Todavía sin votos · neutro hasta que el grupo puntúe</div>}
+                      : <div style={{ fontSize: 11, color: "#7e98b4", fontStyle: "italic" }}>Todavía sin votos · neutro hasta que el grupo puntúe</div>}
                   </div>
                 );
               })}
@@ -605,12 +599,12 @@ export default function App() {
         {tab === "votar" && (
           <>
             {players.length === 0 ? (
-              <div style={{ textAlign: "center", padding: "50px 20px", color: "#1a3a55", border: "1px dashed #1a3a55", borderRadius: 16, marginTop: 18 }}>
+              <div style={{ textAlign: "center", padding: "50px 20px", color: "#36577d", border: "1px dashed #36577d", borderRadius: 16, marginTop: 18 }}>
                 <div style={{ fontSize: 42, marginBottom: 8 }}>🗳️</div>
                 <div style={{ fontFamily: "'Bebas Neue',cursive", fontSize: 17, letterSpacing: 2 }}>PRIMERO CARGÁ JUGADORES</div>
               </div>
             ) : !me ? (
-              <div style={{ textAlign: "center", padding: "44px 24px", color: "#64748b", border: "1px dashed #1a3a55", borderRadius: 16, marginTop: 18 }}>
+              <div style={{ textAlign: "center", padding: "44px 24px", color: "#8597ad", border: "1px dashed #36577d", borderRadius: 16, marginTop: 18 }}>
                 <div style={{ fontSize: 40, marginBottom: 10 }}>👤</div>
                 <div style={{ fontFamily: "'Bebas Neue',cursive", fontSize: 18, letterSpacing: 2, color: "#94a3b8", marginBottom: 6 }}>¿QUIÉN SOS?</div>
                 <div style={{ fontSize: 13, marginBottom: 18 }}>Elegite de la lista para empezar a puntuar a los demás.</div>
@@ -618,20 +612,20 @@ export default function App() {
               </div>
             ) : (
               <>
-                <div style={{ marginTop: 18, marginBottom: 12, fontSize: 12, color: "#3d5a73", lineHeight: 1.5 }}>
+                <div style={{ marginTop: 18, marginBottom: 12, fontSize: 12, color: "#7e98b4", lineHeight: 1.5 }}>
                   Puntuás como <b style={{ color: "#0ea5e9" }}>{me.name}</b>. Tu propia tarjeta no aparece. Tocá un compañero y cargá sus 6 habilidades; los votos son anónimos y se promedian con los del resto.
                 </div>
                 {ratedPlayers.filter(p => String(p.id) !== String(meId)).map(p => {
                   const myVote = (ratings[meId] && ratings[meId][String(p.id)]) || null;
                   const open = openVote === p.id;
                   return (
-                    <div key={p.id} style={{ background: "#09141f", border: `1px solid ${open ? "#0ea5e9" : "#0f2d4a"}`, borderRadius: 14, marginBottom: 10, overflow: "hidden" }}>
+                    <div key={p.id} style={{ background: "#12243a", border: `1px solid ${open ? "#0ea5e9" : "#2c4a6b"}`, borderRadius: 14, marginBottom: 10, overflow: "hidden" }}>
                       <button onClick={() => setOpenVote(open ? null : p.id)} style={{ width: "100%", padding: "13px 14px", background: "transparent", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, textAlign: "left" }}>
                         <span style={{ fontWeight: 700, fontSize: 15, color: "#f1f5f9", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.name}</span>
                         {myVote
                           ? <span style={{ fontSize: 11, color: "#10b981", background: "#10b98115", padding: "2px 8px", borderRadius: 6 }}>✓ lo votaste</span>
-                          : <span style={{ fontSize: 11, color: "#64748b" }}>sin tu voto</span>}
-                        <span style={{ color: "#3d5a73", fontSize: 13 }}>{open ? "▲" : "▼"}</span>
+                          : <span style={{ fontSize: 11, color: "#8597ad" }}>sin tu voto</span>}
+                        <span style={{ color: "#7e98b4", fontSize: 13 }}>{open ? "▲" : "▼"}</span>
                       </button>
                       {open && (
                         <div style={{ padding: "4px 14px 16px" }}>
@@ -652,7 +646,7 @@ export default function App() {
         {tab === "equipos" && (
           <>
             {!generated ? (
-              <div style={{ textAlign: "center", padding: "60px 20px", color: "#1a3a55" }}>
+              <div style={{ textAlign: "center", padding: "60px 20px", color: "#36577d" }}>
                 <div style={{ fontSize: 50, marginBottom: 10 }}>🔀</div>
                 <div style={{ fontFamily: "'Bebas Neue',cursive", fontSize: 20, letterSpacing: 2, marginBottom: 20 }}>TODAVÍA NO HAY EQUIPOS</div>
                 <button onClick={() => setTab("jugadores")} style={{ padding: "12px 28px", borderRadius: 12, background: "linear-gradient(135deg,#1e40af,#0ea5e9)", border: "none", color: "#fff", fontFamily: "'Bebas Neue',cursive", fontSize: 18, letterSpacing: 2, cursor: "pointer" }}>IR A JUGADORES</button>
@@ -660,25 +654,25 @@ export default function App() {
             ) : (
               <>
                 {/* control */}
-                <div style={{ marginTop: 16, background: "#09141f", border: "1px solid #0f2d4a", borderRadius: 12, padding: "11px 14px", display: "flex", alignItems: "center", gap: 10 }}>
-                  <div style={{ flex: 1, fontSize: 12, color: "#3d5a73" }}>
+                <div style={{ marginTop: 16, background: "#12243a", border: "1px solid #2c4a6b", borderRadius: 12, padding: "11px 14px", display: "flex", alignItems: "center", gap: 10 }}>
+                  <div style={{ flex: 1, fontSize: 12, color: "#7e98b4" }}>
                     <span style={{ color: diffColor, fontWeight: 700 }}>
                       {parseFloat(diff) <= 0.4 ? "✓ Muy parejos" : parseFloat(diff) <= 1 ? "~ Parejos" : "⚠ Disparejos"}
                     </span>
                   </div>
-                  <button onClick={handleRandom} style={{ padding: "7px 12px", borderRadius: 9, background: "#0c1c30", border: "1px solid #1a3a55", color: "#64748b", cursor: "pointer", fontFamily: "'Bebas Neue',cursive", fontSize: 13, letterSpacing: 1 }}>🎲 AZAR</button>
+                  <button onClick={handleRandom} style={{ padding: "7px 12px", borderRadius: 9, background: "#18293f", border: "1px solid #36577d", color: "#8597ad", cursor: "pointer", fontFamily: "'Bebas Neue',cursive", fontSize: 13, letterSpacing: 1 }}>🎲 AZAR</button>
                   <button onClick={handleBalance} style={{ padding: "7px 14px", borderRadius: 9, background: "linear-gradient(135deg,#064e3b,#10b981)", border: "none", color: "#fff", fontFamily: "'Bebas Neue',cursive", fontSize: 13, letterSpacing: 1, cursor: "pointer" }}>⚡ BALANCEAR</button>
                 </div>
 
                 {/* camisetas */}
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginTop: 12 }}>
                   {[0, 1].map(ti => (
-                    <div key={ti} style={{ background: "#09141f", border: "1px solid #0f2d4a", borderRadius: 10, padding: "10px 12px" }}>
-                      <div style={{ fontSize: 10, color: "#3d5a73", letterSpacing: 1.5, marginBottom: 8 }}>CAMISETA {ti + 1}</div>
+                    <div key={ti} style={{ background: "#12243a", border: "1px solid #2c4a6b", borderRadius: 10, padding: "10px 12px" }}>
+                      <div style={{ fontSize: 10, color: "#7e98b4", letterSpacing: 1.5, marginBottom: 8 }}>CAMISETA {ti + 1}</div>
                       <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
                         {PALETTES.map(c => (
                           <div key={c.name} onClick={() => { const n = [...palettes]; n[ti] = c; setPalettes(n); }}
-                            style={{ width: 20, height: 20, borderRadius: 4, background: c.bg, border: palettes[ti].name === c.name ? "2px solid #0ea5e9" : "2px solid transparent", cursor: "pointer", boxSizing: "border-box" }} />
+                            style={{ width: 22, height: 22, borderRadius: 5, background: c.bg, border: palettes[ti].name === c.name ? "2px solid #0ea5e9" : "2px solid #ffffff33", cursor: "pointer", boxSizing: "border-box" }} />
                         ))}
                       </div>
                     </div>
@@ -688,20 +682,20 @@ export default function App() {
                 {/* equipos sin stats */}
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 14 }}>
                   {[0, 1].map(ti => (
-                    <div key={ti} style={{ background: "#09141f", border: `1px solid ${palettes[ti].bg}55`, borderRadius: 16, overflow: "hidden" }}>
+                    <div key={ti} style={{ background: "#12243a", border: `1px solid ${palettes[ti].disp}55`, borderRadius: 16, overflow: "hidden" }}>
                       <div style={{ background: palettes[ti].bg, padding: "10px 14px", display: "flex", alignItems: "center", gap: 8 }}>
                         <Shirt pal={palettes[ti]} num={ti + 1} size={34} />
-                        <div style={{ fontFamily: "'Bebas Neue',cursive", fontSize: 18, color: palettes[ti].txt, letterSpacing: 2 }}>EQUIPO {ti + 1}</div>
+                        <div style={{ fontFamily: "'Bebas Neue',cursive", fontSize: 18, color: palettes[ti].txt, letterSpacing: 2 }}>EQUIPO {palettes[ti].name.toUpperCase()}</div>
                       </div>
                       <div style={{ padding: "10px 12px" }}>
                         {teams[ti].map((p, idx) => (
-                          <div key={p.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 0", borderBottom: idx < teams[ti].length - 1 ? "1px solid #0f2040" : "none" }}>
-                            <div style={{ width: 24, height: 24, borderRadius: 6, background: palettes[ti].bg + "33", border: `1px solid ${palettes[ti].bg}55`, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Bebas Neue',cursive", fontSize: 13, color: palettes[ti].bg, flexShrink: 0 }}>{idx + 1}</div>
+                          <div key={p.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 0", borderBottom: idx < teams[ti].length - 1 ? "1px solid #273c5c" : "none" }}>
+                            <div style={{ width: 24, height: 24, borderRadius: 6, background: palettes[ti].disp + "22", border: `1px solid ${palettes[ti].disp}55`, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Bebas Neue',cursive", fontSize: 13, color: palettes[ti].disp, flexShrink: 0 }}>{idx + 1}</div>
                             <span style={{ fontSize: 14, fontWeight: 600, color: "#f1f5f9" }}>{p.name}</span>
                           </div>
                         ))}
                       </div>
-                      <div style={{ background: "#060c15", padding: "6px 12px", borderTop: `1px solid ${palettes[ti].bg}22`, fontSize: 11, color: "#3d5a73", textAlign: "center", letterSpacing: 1 }}>
+                      <div style={{ background: "#0c1a2b", padding: "6px 12px", borderTop: `1px solid ${palettes[ti].disp}22`, fontSize: 11, color: "#7e98b4", textAlign: "center", letterSpacing: 1 }}>
                         {teams[ti].length} JUGADORES
                       </div>
                     </div>
@@ -714,21 +708,22 @@ export default function App() {
                 </button>
 
                 {/* copiar */}
-                <div style={{ marginTop: 12, background: "#09141f", border: "1px solid #0f2d4a", borderRadius: 12, padding: "14px 16px" }}>
-                  <div style={{ fontFamily: "'Bebas Neue',cursive", fontSize: 12, letterSpacing: 2, color: "#2d4a6a", marginBottom: 10 }}>📋 LISTO PARA COPIAR</div>
-                  <div style={{ background: "#060c15", borderRadius: 10, padding: "12px 14px", fontSize: 14, lineHeight: 1.9, color: "#94a3b8", fontFamily: "monospace", whiteSpace: "pre-wrap", userSelect: "all" }}>
+                <div style={{ marginTop: 12, background: "#12243a", border: "1px solid #2c4a6b", borderRadius: 12, padding: "14px 16px" }}>
+                  <div style={{ fontFamily: "'Bebas Neue',cursive", fontSize: 12, letterSpacing: 2, color: "#738cab", marginBottom: 10 }}>📋 LISTO PARA COPIAR</div>
+                  <div style={{ background: "#0c1a2b", borderRadius: 10, padding: "12px 14px", fontSize: 14, lineHeight: 1.9, color: "#94a3b8", fontFamily: "monospace", whiteSpace: "pre-wrap", userSelect: "all" }}>
 {`⚽ FÚTBOL 5 — DOMINGO
 
-🔴 EQUIPO 1
+${palettes[0].name === "Blanco" ? "⚪" : "⚫"} EQUIPO ${palettes[0].name.toUpperCase()}
 ${teams[0].map((p, i) => `${i + 1}. ${p.name}`).join("\n")}
 
-🔵 EQUIPO 2
+${palettes[1].name === "Blanco" ? "⚪" : "⚫"} EQUIPO ${palettes[1].name.toUpperCase()}
 ${teams[1].map((p, i) => `${i + 1}. ${p.name}`).join("\n")}
 
 ¡A jugar! 🎉`}
                   </div>
                   <button onClick={() => {
-                    const txt = `⚽ FÚTBOL 5 — DOMINGO\n\n🔴 EQUIPO 1\n${teams[0].map((p, i) => `${i + 1}. ${p.name}`).join("\n")}\n\n🔵 EQUIPO 2\n${teams[1].map((p, i) => `${i + 1}. ${p.name}`).join("\n")}\n\n¡A jugar! 🎉`;
+                    const e1 = palettes[0].name === "Blanco" ? "⚪" : "⚫"; const e2 = palettes[1].name === "Blanco" ? "⚪" : "⚫";
+                    const txt = `⚽ FÚTBOL 5 — DOMINGO\n\n${e1} EQUIPO ${palettes[0].name.toUpperCase()}\n${teams[0].map((p, i) => `${i + 1}. ${p.name}`).join("\n")}\n\n${e2} EQUIPO ${palettes[1].name.toUpperCase()}\n${teams[1].map((p, i) => `${i + 1}. ${p.name}`).join("\n")}\n\n¡A jugar! 🎉`;
                     navigator.clipboard.writeText(txt).then(() => showToast("✓ Copiado"));
                   }} style={{ width: "100%", marginTop: 10, padding: 11, borderRadius: 10, border: "none", cursor: "pointer", background: "linear-gradient(135deg,#1e40af,#0ea5e9)", color: "#fff", fontFamily: "'Bebas Neue',cursive", fontSize: 16, letterSpacing: 2 }}>
                     📋 COPIAR
@@ -743,12 +738,12 @@ ${teams[1].map((p, i) => `${i + 1}. ${p.name}`).join("\n")}
         {tab === "historial" && (
           <>
             {matches.length === 0 ? (
-              <div style={{ textAlign: "center", padding: "50px 20px", color: "#1a3a55", border: "1px dashed #1a3a55", borderRadius: 16, marginTop: 18 }}>
+              <div style={{ textAlign: "center", padding: "50px 20px", color: "#36577d", border: "1px dashed #36577d", borderRadius: 16, marginTop: 18 }}>
                 <div style={{ fontSize: 42, marginBottom: 8 }}>📋</div>
                 <div style={{ fontFamily: "'Bebas Neue',cursive", fontSize: 17, letterSpacing: 2 }}>
                   ACÁ VAN A APARECER TUS PARTIDOS
                 </div>
-                <div style={{ fontSize: 12, color: "#2d4a6a", marginTop: 6 }}>
+                <div style={{ fontSize: 12, color: "#738cab", marginTop: 6 }}>
                   Armá equipos y guardá el partido
                 </div>
               </div>
@@ -764,17 +759,17 @@ ${teams[1].map((p, i) => `${i + 1}. ${p.name}`).join("\n")}
               players.forEach(p => { playerMap[p.id] = p.name; });
 
               return (
-                <div key={m.id} style={{ background: "#09141f", border: `1px solid ${m.resultado === "parejo" ? "#10b98133" : m.resultado === "disparejo" ? "#ef444433" : "#0f2d4a"}`, borderRadius: 16, marginTop: 16, overflow: "hidden" }}>
+                <div key={m.id} style={{ background: "#12243a", border: `1px solid ${m.resultado === "parejo" ? "#10b98133" : m.resultado === "disparejo" ? "#ef444433" : "#2c4a6b"}`, borderRadius: 16, marginTop: 16, overflow: "hidden" }}>
                   {/* header */}
-                  <div style={{ padding: "12px 14px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #0f2040" }}>
+                  <div style={{ padding: "12px 14px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #273c5c" }}>
                     <div>
                       <div style={{ fontFamily: "'Bebas Neue',cursive", fontSize: 16, letterSpacing: 2, color: "#fff" }}>
                         {fmtDate(m.date)}
                       </div>
-                      <div style={{ fontSize: 11, color: "#3d5a73" }}>
+                      <div style={{ fontSize: 11, color: "#7e98b4" }}>
                         {(m.team1Names?.length || 0) + (m.team2Names?.length || 0)} jugadores
-                        {m.ganador === "team1" && <span style={{ color: pal1.bg }}> · ganó Equipo 1</span>}
-                        {m.ganador === "team2" && <span style={{ color: pal2.bg }}> · ganó Equipo 2</span>}
+                        {m.ganador === "team1" && <span style={{ color: pal1.disp }}> · ganó Equipo 1</span>}
+                        {m.ganador === "team2" && <span style={{ color: pal2.disp }}> · ganó Equipo 2</span>}
                         {m.ganador === "empate" && <span style={{ color: "#94a3b8" }}> · empate</span>}
                       </div>
                     </div>
@@ -788,15 +783,15 @@ ${teams[1].map((p, i) => `${i + 1}. ${p.name}`).join("\n")}
                         {m.resultado === "parejo" ? "👍 PAREJO" : "⚠️ DISPAREJO"}
                       </div>
                     ) : (
-                      <div style={{ fontSize: 11, color: "#3d5a73", fontStyle: "italic" }}>sin calificar</div>
+                      <div style={{ fontSize: 11, color: "#7e98b4", fontStyle: "italic" }}>sin calificar</div>
                     )}
                   </div>
 
                   {/* equipos */}
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1, background: "#0f2040" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1, background: "#273c5c" }}>
                     {[{ names: m.team1Names, pal: pal1, label: "EQUIPO 1" }, { names: m.team2Names, pal: pal2, label: "EQUIPO 2" }].map((t, ti) => (
-                      <div key={ti} style={{ background: "#09141f", padding: "10px 12px" }}>
-                        <div style={{ fontSize: 11, fontFamily: "'Bebas Neue',cursive", letterSpacing: 1.5, color: t.pal.bg, marginBottom: 6 }}>{t.label}</div>
+                      <div key={ti} style={{ background: "#12243a", padding: "10px 12px" }}>
+                        <div style={{ fontSize: 11, fontFamily: "'Bebas Neue',cursive", letterSpacing: 1.5, color: t.pal.disp, marginBottom: 6 }}>EQUIPO {t.pal.name.toUpperCase()}</div>
                         {(t.names || []).map((name, i) => (
                           <div key={i} style={{ fontSize: 13, color: "#94a3b8", paddingBottom: 2 }}>
                             {i + 1}. {name}
@@ -811,20 +806,20 @@ ${teams[1].map((p, i) => `${i + 1}. ${p.name}`).join("\n")}
 
                     {/* ¿quién ganó? */}
                     <div>
-                      <div style={{ fontSize: 11, color: "#3d5a73", letterSpacing: 1, marginBottom: 8 }}>¿QUIÉN GANÓ?</div>
+                      <div style={{ fontSize: 11, color: "#7e98b4", letterSpacing: 1, marginBottom: 8 }}>¿QUIÉN GANÓ?</div>
                       <div style={{ display: "flex", gap: 8 }}>
                         {[
-                          { val: "team1",  label: "EQUIPO 1", accent: pal1.bg },
-                          { val: "empate", label: "EMPATE",   accent: "#64748b" },
-                          { val: "team2",  label: "EQUIPO 2", accent: pal2.bg },
+                          { val: "team1",  label: pal1.name.toUpperCase(), accent: pal1.disp },
+                          { val: "empate", label: "EMPATE",   accent: "#94a3b8" },
+                          { val: "team2",  label: pal2.name.toUpperCase(), accent: pal2.disp },
                         ].map(opt => {
                           const on = m.ganador === opt.val;
                           return (
                             <button key={opt.val} onClick={() => setGanador(m.id, opt.val)} style={{
                               flex: 1, padding: "9px 4px", borderRadius: 10, cursor: "pointer",
-                              border: `1px solid ${on ? opt.accent : "#1a3a55"}`,
-                              background: on ? opt.accent + "22" : "#0c1c30",
-                              color: on ? opt.accent : "#64748b",
+                              border: `1px solid ${on ? opt.accent : "#36577d"}`,
+                              background: on ? opt.accent + "22" : "#18293f",
+                              color: on ? opt.accent : "#8597ad",
                               fontFamily: "'Bebas Neue',cursive", fontSize: 13, letterSpacing: 1,
                             }}>{opt.label}</button>
                           );
@@ -834,8 +829,8 @@ ${teams[1].map((p, i) => `${i + 1}. ${p.name}`).join("\n")}
 
                     {/* ¿estuvo parejo? (feedback para el balanceo) */}
                     <div>
-                      <div style={{ fontSize: 11, color: "#3d5a73", letterSpacing: 1, marginBottom: 8 }}>
-                        ¿ESTUVO PAREJO? <span style={{ color: "#2d4a6a" }}>· ajusta el balanceo futuro</span>
+                      <div style={{ fontSize: 11, color: "#7e98b4", letterSpacing: 1, marginBottom: 8 }}>
+                        ¿ESTUVO PAREJO? <span style={{ color: "#738cab" }}>· ajusta el balanceo futuro</span>
                       </div>
                       <div style={{ display: "flex", gap: 8 }}>
                         <button onClick={() => setResultado(m.id, "parejo")} style={{ flex: 1, padding: "10px", borderRadius: 10, border: `1px solid ${m.resultado === "parejo" ? "#10b981" : "#10b98144"}`, background: m.resultado === "parejo" ? "#10b98122" : "#10b98111", color: "#10b981", fontFamily: "'Bebas Neue',cursive", fontSize: 15, letterSpacing: 1, cursor: "pointer" }}>
@@ -859,9 +854,9 @@ ${teams[1].map((p, i) => `${i + 1}. ${p.name}`).join("\n")}
                         { label: "⚽ GOLEADOR", val: m.goleador, set: setGoleador, accent: "#10b981" },
                       ].map((f, fi) => (
                         <div key={fi}>
-                          <div style={{ fontSize: 11, color: "#3d5a73", letterSpacing: 1, marginBottom: 6 }}>{f.label}</div>
+                          <div style={{ fontSize: 11, color: "#7e98b4", letterSpacing: 1, marginBottom: 6 }}>{f.label}</div>
                           <select value={f.val ?? ""} onChange={e => f.set(m.id, e.target.value === "" ? null : Number(e.target.value))}
-                            style={{ width: "100%", padding: "9px 10px", borderRadius: 9, background: "#0c1c30", border: `1px solid ${f.val != null ? f.accent + "88" : "#1a3a55"}`, color: f.val != null ? f.accent : "#64748b", fontSize: 13, outline: "none", cursor: "pointer" }}>
+                            style={{ width: "100%", padding: "9px 10px", borderRadius: 9, background: "#18293f", border: `1px solid ${f.val != null ? f.accent + "88" : "#36577d"}`, color: f.val != null ? f.accent : "#8597ad", fontSize: 13, outline: "none", cursor: "pointer" }}>
                             <option value="" style={{ color: "#000" }}>— elegir —</option>
                             {matchPlayers.map(pid => (
                               <option key={pid} value={pid} style={{ color: "#000" }}>{matchNames[pid]}</option>
@@ -873,7 +868,7 @@ ${teams[1].map((p, i) => `${i + 1}. ${p.name}`).join("\n")}
 
                     {/* asistencias */}
                     <div>
-                      <button onClick={() => setAttModal(attModal === m.id ? null : m.id)} style={{ width: "100%", padding: "8px", borderRadius: 8, background: "#0c1c30", border: "1px solid #1a3a55", color: "#64748b", cursor: "pointer", fontSize: 13, fontFamily: "'Bebas Neue',cursive", letterSpacing: 1 }}>
+                      <button onClick={() => setAttModal(attModal === m.id ? null : m.id)} style={{ width: "100%", padding: "8px", borderRadius: 8, background: "#18293f", border: "1px solid #36577d", color: "#8597ad", cursor: "pointer", fontSize: 13, fontFamily: "'Bebas Neue',cursive", letterSpacing: 1 }}>
                         {attModal === m.id ? "▲ CERRAR ASISTENCIAS" : `📅 REGISTRAR ASISTENCIAS (${Object.values(m.asistencias || {}).filter(Boolean).length}/${allPlayers.length})`}
                       </button>
 
@@ -885,9 +880,9 @@ ${teams[1].map((p, i) => `${i + 1}. ${p.name}`).join("\n")}
                             return (
                               <button key={pid} onClick={() => toggleAsistencia(m.id, pid)} style={{
                                 padding: "8px 10px", borderRadius: 9, cursor: "pointer",
-                                background: present ? "#10b98118" : "#0c1c30",
-                                border: `1px solid ${present ? "#10b981" : "#1a3a55"}`,
-                                color: present ? "#10b981" : "#475569",
+                                background: present ? "#10b98118" : "#18293f",
+                                border: `1px solid ${present ? "#10b981" : "#36577d"}`,
+                                color: present ? "#10b981" : "#6d8099",
                                 fontSize: 13, fontWeight: 600, textAlign: "left",
                                 display: "flex", alignItems: "center", gap: 6, transition: "all .15s",
                               }}>
@@ -915,12 +910,12 @@ ${teams[1].map((p, i) => `${i + 1}. ${p.name}`).join("\n")}
         {tab === "stats" && (
           <>
             {statList().length === 0 ? (
-              <div style={{ textAlign: "center", padding: "50px 20px", color: "#1a3a55", border: "1px dashed #1a3a55", borderRadius: 16, marginTop: 18 }}>
+              <div style={{ textAlign: "center", padding: "50px 20px", color: "#36577d", border: "1px dashed #36577d", borderRadius: 16, marginTop: 18 }}>
                 <div style={{ fontSize: 42, marginBottom: 8 }}>🏆</div>
                 <div style={{ fontFamily: "'Bebas Neue',cursive", fontSize: 17, letterSpacing: 2 }}>
                   TODAVÍA NO HAY ESTADÍSTICAS
                 </div>
-                <div style={{ fontSize: 12, color: "#2d4a6a", marginTop: 6 }}>
+                <div style={{ fontSize: 12, color: "#738cab", marginTop: 6 }}>
                   Jugá partidos y cargá resultados y asistencias
                 </div>
               </div>
@@ -959,20 +954,20 @@ ${teams[1].map((p, i) => `${i + 1}. ${p.name}`).join("\n")}
                 </div>
 
                 {/* RANKING DE VICTORIAS */}
-                <div style={{ marginTop: 16, background: "#09141f", border: "1px solid #0f2d4a", borderRadius: 16, overflow: "hidden" }}>
-                  <div style={{ padding: "12px 16px", borderBottom: "1px solid #0f2040", display: "flex", alignItems: "center", gap: 8 }}>
+                <div style={{ marginTop: 16, background: "#12243a", border: "1px solid #2c4a6b", borderRadius: 16, overflow: "hidden" }}>
+                  <div style={{ padding: "12px 16px", borderBottom: "1px solid #273c5c", display: "flex", alignItems: "center", gap: 8 }}>
                     <span style={{ fontSize: 16 }}>⚽</span>
                     <div style={{ fontFamily: "'Bebas Neue',cursive", fontSize: 16, letterSpacing: 2, color: "#10b981" }}>RANKING DE VICTORIAS</div>
                   </div>
                   <div style={{ padding: "4px 14px 10px" }}>
                     {rankingVictorias.map((x, i) => (
-                      <div key={x.p.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "9px 0", borderBottom: i < rankingVictorias.length - 1 ? "1px solid #0f2040" : "none" }}>
-                        <div style={{ width: 22, textAlign: "center", fontFamily: "'Bebas Neue',cursive", fontSize: 14, color: "#3d5a73" }}>{i + 1}</div>
+                      <div key={x.p.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "9px 0", borderBottom: i < rankingVictorias.length - 1 ? "1px solid #273c5c" : "none" }}>
+                        <div style={{ width: 22, textAlign: "center", fontFamily: "'Bebas Neue',cursive", fontSize: 14, color: "#7e98b4" }}>{i + 1}</div>
                         <div style={{ flex: 1, minWidth: 0, fontSize: 14, fontWeight: 600, color: "#f1f5f9", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{x.p.name}</div>
-                        <div style={{ fontSize: 11, color: "#3d5a73" }}>{x.st.decididos ? Math.round(x.st.winRate * 100) + "%" : "—"}</div>
+                        <div style={{ fontSize: 11, color: "#7e98b4" }}>{x.st.decididos ? Math.round(x.st.winRate * 100) + "%" : "—"}</div>
                         <div style={{ minWidth: 54, textAlign: "right" }}>
                           <span style={{ fontFamily: "'Bebas Neue',cursive", fontSize: 18, color: "#10b981" }}>{x.st.v}</span>
-                          <span style={{ fontSize: 11, color: "#3d5a73" }}> /{x.st.pj}</span>
+                          <span style={{ fontSize: 11, color: "#7e98b4" }}> /{x.st.pj}</span>
                         </div>
                       </div>
                     ))}
@@ -980,8 +975,8 @@ ${teams[1].map((p, i) => `${i + 1}. ${p.name}`).join("\n")}
                 </div>
 
                 {/* RANKING DE PRESENCIAS */}
-                <div style={{ marginTop: 16, background: "#09141f", border: "1px solid #0f2d4a", borderRadius: 16, overflow: "hidden" }}>
-                  <div style={{ padding: "12px 16px", borderBottom: "1px solid #0f2040", display: "flex", alignItems: "center", gap: 8 }}>
+                <div style={{ marginTop: 16, background: "#12243a", border: "1px solid #2c4a6b", borderRadius: 16, overflow: "hidden" }}>
+                  <div style={{ padding: "12px 16px", borderBottom: "1px solid #273c5c", display: "flex", alignItems: "center", gap: 8 }}>
                     <span style={{ fontSize: 16 }}>📅</span>
                     <div style={{ fontFamily: "'Bebas Neue',cursive", fontSize: 16, letterSpacing: 2, color: "#0ea5e9" }}>RANKING DE PRESENCIAS</div>
                   </div>
@@ -989,11 +984,11 @@ ${teams[1].map((p, i) => `${i + 1}. ${p.name}`).join("\n")}
                     {rankingPresencias.map((x, i) => {
                       const max = rankingPresencias[0].st.presencias || 1;
                       return (
-                        <div key={x.p.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "9px 0", borderBottom: i < rankingPresencias.length - 1 ? "1px solid #0f2040" : "none" }}>
-                          <div style={{ width: 22, textAlign: "center", fontFamily: "'Bebas Neue',cursive", fontSize: 14, color: "#3d5a73" }}>{i + 1}</div>
+                        <div key={x.p.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "9px 0", borderBottom: i < rankingPresencias.length - 1 ? "1px solid #273c5c" : "none" }}>
+                          <div style={{ width: 22, textAlign: "center", fontFamily: "'Bebas Neue',cursive", fontSize: 14, color: "#7e98b4" }}>{i + 1}</div>
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <div style={{ fontSize: 14, fontWeight: 600, color: "#f1f5f9", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginBottom: 4 }}>{x.p.name}</div>
-                            <div style={{ height: 4, borderRadius: 2, background: "#0f2040" }}>
+                            <div style={{ height: 4, borderRadius: 2, background: "#273c5c" }}>
                               <div style={{ height: "100%", width: `${(x.st.presencias / max) * 100}%`, borderRadius: 2, background: "#0ea5e9" }} />
                             </div>
                           </div>
@@ -1004,7 +999,7 @@ ${teams[1].map((p, i) => `${i + 1}. ${p.name}`).join("\n")}
                   </div>
                 </div>
 
-                <div style={{ fontSize: 11, color: "#2d4a6a", textAlign: "center", marginTop: 14, lineHeight: 1.6 }}>
+                <div style={{ fontSize: 11, color: "#738cab", textAlign: "center", marginTop: 14, lineHeight: 1.6 }}>
                   Los puntos combinan rendimiento (victorias, suavizado) y compromiso (presencias), más bonus por figura del partido (+5) y goleador (+3).
                 </div>
               </>
@@ -1015,7 +1010,7 @@ ${teams[1].map((p, i) => `${i + 1}. ${p.name}`).join("\n")}
 
       {/* TOAST */}
       {toast && (
-        <div style={{ position: "fixed", bottom: 28, left: "50%", transform: "translateX(-50%)", background: "#0c1c30", border: "1px solid #1a3a55", borderRadius: 12, padding: "11px 22px", color: "#e2e8f0", fontSize: 14, boxShadow: "0 8px 32px #000c", zIndex: 999, whiteSpace: "nowrap" }}>
+        <div style={{ position: "fixed", bottom: 28, left: "50%", transform: "translateX(-50%)", background: "#18293f", border: "1px solid #36577d", borderRadius: 12, padding: "11px 22px", color: "#e2e8f0", fontSize: 14, boxShadow: "0 8px 32px #000c", zIndex: 999, whiteSpace: "nowrap" }}>
           {toast}
         </div>
       )}
@@ -1025,7 +1020,7 @@ ${teams[1].map((p, i) => `${i + 1}. ${p.name}`).join("\n")}
         input, select, button { font-family: inherit; }
         input:focus { border-color: #0ea5e9 !important; }
         ::-webkit-scrollbar { width: 3px; }
-        ::-webkit-scrollbar-thumb { background: #1a3a55; border-radius: 2px; }
+        ::-webkit-scrollbar-thumb { background: #36577d; border-radius: 2px; }
       `}</style>
     </div>
   );
