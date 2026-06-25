@@ -7,7 +7,7 @@ const firebaseConfig = {
   projectId: "equipos-domingo",
   storageBucket: "equipos-domingo.firebasestorage.app",
   messagingSenderId: "582493741897",
-  appId: "1:582493741897:web:175c9927442643afdeb098"
+  appId: "1:582493741897:web:175c9927442643afdeb098",
 };
 
 const ready = !!firebaseConfig.apiKey && !String(firebaseConfig.apiKey).includes("PEGAR");
